@@ -1767,7 +1767,7 @@ function autoScanManual(){
     var kode = input.value.trim();
 
     // jika panjang kode sudah cukup (scanner biasanya langsung panjang)
-    if(kode.length >= 5){
+    if(kode.length >= 16){
 
         setTimeout(function(){
 
@@ -1814,13 +1814,7 @@ document.onkeydown = function(e){
 
 };
 
-document.onselectstart = function(){
-return false;
-};
 
-document.oncopy = function(){
-return false;
-};
 
 (function(){
 
@@ -1857,6 +1851,7 @@ setInterval(detectDevTools,1000);
 </div>
 </body>
 </html>
+
 
 
 
