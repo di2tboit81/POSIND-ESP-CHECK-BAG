@@ -665,6 +665,10 @@ h3:nth-of-type(4)
     margin-bottom:15px;
 }
 
+#listKantong td {
+user-select: text;
+}
+
 </style>
 </head>
 <body>
@@ -1815,6 +1819,15 @@ document.onkeydown = function(e){
 };
 
 
+document.onselectstart = function(e){
+
+    if(e.target.closest("#listKantong")){
+        return true;
+    }
+
+    return false;
+};
+
 
 (function(){
 
@@ -1838,6 +1851,28 @@ function detectDevTools(){
 setInterval(detectDevTools,1000);
 
 })();
+
+// ===== KLIK NOMOR KANTONG AUTO COPY =====
+document.addEventListener("click", function(e){
+
+    if(e.target.tagName === "TD" && e.target.parentElement.parentElement.id === "listKantong"){
+
+        var teks = e.target.innerText;
+
+        navigator.clipboard.writeText(teks).then(function(){
+
+            // efek notifikasi kecil
+            e.target.style.background = "#00c896";
+
+            setTimeout(function(){
+                e.target.style.background = "";
+            },500);
+
+        });
+
+    }
+
+});
 
 </script>
 <!-- FOOTER COPYRIGHT -->
