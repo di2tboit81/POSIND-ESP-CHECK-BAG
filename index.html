@@ -730,7 +730,8 @@ user-select: text;
 <select id="targetUploadExcel">
 <option value="win1">DATA WIN1</option>
 <option value="win2">DATA WIN2</option>
-<option value="all">DATA WIN1 & WIN2</option>
+<option value="win3">DATA WIN3</option> <!-- 🔥 TAMBAHAN -->
+<option value="all">DATA WIN1, WIN2 & WIN3</option>
 </select>
 
     <label for="fileExcelAdmin" class="neon-upload">
@@ -748,7 +749,8 @@ user-select: text;
 <select id="targetHapusData" onchange="loadJudulAdmin()">
 <option value="win1">HAPUS DATA WIN1</option>
 <option value="win2">HAPUS DATA WIN2</option>
-<option value="all">HAPUS DATA WIN1 & WIN2</option>
+<option value="win3">HAPUS DATA WIN3</option> <!-- 🔥 TAMBAHAN -->
+<option value="all">HAPUS DATA WIN1, WIN2 & WIN3</option>
 </select>
 
 <select id="hapusJudulDropdown"></select>
@@ -834,19 +836,26 @@ function getDBUser(){
 
     var role = sessionStorage.getItem("role");
     var mode = sessionStorage.getItem("mode");
+    var wilayah = sessionStorage.getItem("wilayah");
 
-    // 🔥 ADMIN lihat semua data (WIN1 + WIN2)
+    // ADMIN lihat semua
     if(role === "admin"){
         return dbRoot;
     }
 
     // PETUGAS
     if(role === "petugas"){
+
         if(mode === "readonly"){
             return dbRoot.child("win2");
-        }else{
-            return dbRoot.child("win1");
         }
+
+        // 🔥 WIN1 & WIN3 (mode normal)
+        if(wilayah === "win3"){
+            return dbRoot.child("win3");
+        }
+
+        return dbRoot.child("win1");
     }
 
     // USER default
@@ -890,12 +899,20 @@ function loginPetugas(){
 
     if(user==="Win1" && pass==="29400"){
         sessionStorage.setItem("role","petugas");
-        sessionStorage.setItem("mode","normal"); // 🔥 mode normal (hapus data)
+        sessionStorage.setItem("mode","normal");
+        sessionStorage.setItem("wilayah","win1"); // 🔥 TAMBAHAN
         tampilkanHalaman("petugas");
     } 
     else if(user==="Win2" && pass==="29400"){
         sessionStorage.setItem("role","petugas");
-        sessionStorage.setItem("mode","readonly"); // 🔥 mode khusus Win2
+        sessionStorage.setItem("mode","readonly");
+        sessionStorage.setItem("wilayah","win2"); // 🔥 TAMBAHAN
+        tampilkanHalaman("petugas");
+    } 
+    else if(user==="Win3" && pass==="29400"){ // 🔥 TAMBAHAN
+        sessionStorage.setItem("role","petugas");
+        sessionStorage.setItem("mode","normal");
+        sessionStorage.setItem("wilayah","win3");
         tampilkanHalaman("petugas");
     } 
     else {
@@ -1328,12 +1345,14 @@ dbRoot.once("value", function(snap){
     // PETUGAS WIN1
     else if(role === "petugas" && mode === "normal"){
 
-        if(data.win1){
-            for(var j in data.win1){
-                judulData[j] = true;
-            }
+    var wilayah = sessionStorage.getItem("wilayah");
+
+    if(data[wilayah]){
+        for(var j in data[wilayah]){
+            judulData[j] = true;
         }
     }
+}
 
     // PETUGAS WIN2
     else if(role === "petugas" && mode === "readonly"){
@@ -1499,15 +1518,23 @@ function hapusPerJudul(){
         alert("Data judul " + judul + " berhasil dihapus dari WIN2!");
 
     }
+	
+	else if(target === "win3"){
+
+    dbRoot.child("win3").child(judul).remove();
+    alert("Data judul " + judul + " berhasil dihapus dari WIN3!");
+
+    }
 
     else if(target === "all"){
 
-        dbRoot.child("win1").child(judul).remove();
-        dbRoot.child("win2").child(judul).remove();
+    dbRoot.child("win1").child(judul).remove();
+    dbRoot.child("win2").child(judul).remove();
+    dbRoot.child("win3").child(judul).remove(); // 🔥 TAMBAHAN
 
-        alert("Data judul " + judul + " berhasil dihapus dari WIN1 & WIN2!");
+    alert("Data judul " + judul + " berhasil dihapus dari WIN1, WIN2 & WIN3!");
 
-    }
+}
 
     filterList();
 }
@@ -1578,17 +1605,17 @@ function uploadExcelAdmin(){
                 status_win2:keteranganWin2,
                 infoJudul:infoJudul
             };
+if(target === "all"){
 
-            if(target === "all"){
+    dbRoot.child("win1").child(judul).child(kode).set(dataObj);
+    dbRoot.child("win2").child(judul).child(kode).set(dataObj);
+    dbRoot.child("win3").child(judul).child(kode).set(dataObj); // 🔥 TAMBAHAN
 
-                dbRoot.child("win1").child(judul).child(kode).set(dataObj);
-                dbRoot.child("win2").child(judul).child(kode).set(dataObj);
+}else{
 
-            }else{
+    dbRoot.child(target).child(judul).child(kode).set(dataObj);
 
-                dbRoot.child(target).child(judul).child(kode).set(dataObj);
-
-            }
+}
 
             count++;
 
@@ -1739,6 +1766,12 @@ function loadJudulAdmin(){
                 hapusDropdown.innerHTML += "<option value='"+j+"'>"+j+"</option>";
             }
         }
+		
+		else if(target === "win3" && data.win3){
+    for(var j in data.win3){
+        hapusDropdown.innerHTML += "<option value='"+j+"'>"+j+"</option>";
+    }
+}
 
         // ===== ALL =====
         else if(target === "all"){
@@ -1756,6 +1789,12 @@ function loadJudulAdmin(){
                     judulSet[j] = true;
                 }
             }
+			
+			if(data.win3){
+    for(var j in data.win3){
+        judulSet[j] = true;
+    }
+}
 
             for(var j in judulSet){
                 hapusDropdown.innerHTML += "<option value='"+j+"'>"+j+"</option>";
