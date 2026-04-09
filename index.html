@@ -1009,6 +1009,31 @@ if(role === "petugas"){
         filterList();
 
     }, 500);
+	
+	// ===== KHUSUS WIN3 UBAH TEXT =====
+var wilayah = sessionStorage.getItem("wilayah");
+
+if(wilayah === "win3"){
+
+    // TOTAL KANTONG PENGAJUAN → TOTAL CN / RESI DITOLAK BC
+    var judulBox = document.querySelector("#infoJudulBox h3");
+    if(judulBox){
+        judulBox.innerText = "TOTAL CN / RESI TOLAK BC";
+    }
+
+    // SCAN KANTONG → SCAN CN / RESI
+    var scanJudul = document.querySelectorAll("h3")[2];
+    if(scanJudul){
+        scanJudul.innerText = "SCAN CN / RESI";
+    }
+
+    // INPUT MANUAL NO KANTONG → Input Manual No CN / RESI
+    var inputManual = document.getElementById("manualScanPetugas");
+    if(inputManual){
+        inputManual.placeholder = "Input Manual No CN / RESI";
+    }
+}
+	
 }
 }
 // Sembunyikan tombol keluar setelah login
